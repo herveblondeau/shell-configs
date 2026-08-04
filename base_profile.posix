@@ -1,0 +1,315 @@
+# THIS FILE CONTAINS GENERAL ALIASES THAT DO NOT REQUIRE ANY EXTERNAL TOOL TO BE DEFINED
+
+# GENERAL
+# Global editing
+export EDITOR=/usr/bin/vi
+
+# Global resources:
+# https://stackoverflow.com/questions/18568706/check-number-of-arguments-passed-to-a-bash-script
+# https://stackoverflow.com/questions/18042279/how-to-exit-a-function-in-bash
+# https://tecadmin.net/bash-press-any-key-to-continue/
+# https://unix.stackexchange.com/questions/572267/how-to-negate-regex-using-test
+
+# Bash command shortcuts
+alias p="pwd"
+alias l="ls -l"
+alias la="ls -la"
+alias m="mv"
+alias r="rm -rf"
+alias c="cd"
+alias u="cd .."
+alias uu="cd ../.."
+alias uuu="cd ../../.."
+alias ul="u;l"
+alias uul="u;ul"
+alias uul="u;uul"
+alias uuul="u;uuul"
+alias cl="clear"
+alias g="grep -i"
+alias gr="grep -rli"
+alias e="exit"
+alias k="kill -9"
+alias kp="npx kill-port"
+alias ddate="echo \"\$(date) | \$(date '+%Y-%m-%d %H:%M:%S') | \$((\$(date +%s%N)/1000000))\""
+f() {
+    if [[ $# -eq 1 ]]; then
+        find . -iname "*$1*" -printf "%y %p\n" 2>/dev/null
+        return
+    fi
+
+    if [[ $# -eq 2 ]]; then
+        find $2 -iname "*$1*" -printf "%y %p\n" 2>/dev/null
+        return
+    fi
+
+    echo "1 or 2 parameters required: part of file/folder name to search and folder to start the search from"
+}
+
+# Powershell emulation
+alias dir="ls -l"
+
+# GIT-SPECIFIC
+alias ginit="git init"
+alias clone="git clone"
+alias status="git status"
+alias log="git log --pretty=format:'%h%x09%an%x09%ad%x09%s'"
+alias logn="log|head -n"
+alias five="logn 5"
+alias ten="logn 10"
+alias twenty="logn 20"
+alias twen="twenty"
+alias logf="log --name-only"
+alias logs="git log --graph --pretty=format='%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cD) %C(bold blue)<%an>%Creset' --abbrev-commit"
+alias branch="git branch -a"
+alias checkout="git checkout"
+alias pull="git pull"
+alias fetch="git fetch;git branch"
+alias merge="git merge --no-ff"
+alias push="git push"
+alias cm="git commit -m"
+alias cmm="git commit -m"
+alias commit="git commit -m"
+alias amend="git commit --amend"
+alias show="git show --pretty="format:'%h%x09%an%x09%ad%x09%s'""
+alias showw="showw --name-only"
+alias stage="git add ."
+alias unstage="git restore --staged ."
+alias blame="git blame -C -C -C"
+
+logg() {
+    if [[ $# -ne 2 ]]; then
+        echo "2 parameters required: number of log entries and text to search"
+        return
+    fi
+
+    logn $1 | grep -i $2
+}
+
+# Soft resets the last commits
+reset() {
+    if [[ $# -ne 1 ]]; then
+        echo "1 parameter required: number of commits to soft reset"
+        return
+    fi
+
+    git reset HEAD~$1
+}
+
+# Hard resets the last commits
+reseth() {
+    if [[ $# -ne 1 ]]; then
+        echo "1 parameter required: number of commits to hard reset"
+        return
+    fi
+
+    git reset HEAD~$1 --hard
+}
+
+# Interactively rebases the last commits
+rebase() {
+    if [[ $# -ne 1 ]]; then
+        echo "1 parameter required: number of commits to rebase"
+        return
+    fi
+
+    git rebase -i HEAD~$1
+}
+
+# Reverts the last commits
+revert() {
+    if [[ $# -ne 1 ]]; then
+        echo "1 parameter required: number of commits to revert"
+        return
+    fi
+
+    git revert -i HEAD~$1
+}
+
+#alias show="git diff-tree --no-commit-id --name-only -r" #https://www.w3docs.com/snippets/git/how-to-list-all-the-files-in-a-commit.html
+
+# Creates an unnamed stash with the local changes
+# Does nothing if there are no local changes
+alias stash="stage;git stash"
+
+# Creates a named stash with the local changes
+# Does nothing if there are no local changes
+alias stashm="stage;git stash push -m"
+
+# Creates a named stash with the local changes
+# Contrary to stashm, if there are no local changes, it creates a ".empty" file first
+# Therefore, with stashmm, a stash is always created
+stashmm() {
+    if [[ $# -ne 1 ]]; then
+        echo "1 parameter required: stash name"
+        return
+    fi
+
+    if [[ ! -n $(git status --porcelain) ]]; then # --porcelain gives a simplified output
+        touch .empty
+    fi
+
+    stashm $1;
+}
+
+# Applies a list of stashes
+# The stash numbers must be supplied separated by spaces
+ap() {
+    # https://stackoverflow.com/questions/9143865/how-to-combine-multiple-stashes-in-git
+    # https://stackoverflow.com/questions/255898/how-to-iterate-over-arguments-in-a-bash-script
+    for stashNumber in "$@"
+    do
+        git add .
+        git stash apply $stashNumber
+        git reset
+    done
+}
+
+# Renames a branch
+rename() {
+    if [[ $# -ne 2 ]]; then
+        echo "2 parameters required: current branch name and new branch name"
+        return
+    fi
+
+    git checkout $1
+    git branch -m $2
+    git push origin -u $2
+    git push origin --delete $1
+}
+
+alias list="git stash list"
+alias po="git stash pop;unstage"
+alias drop="git stash drop"
+alias md="git merge develop"
+alias mr="git merge release"
+alias mm="git merge master"
+alias chb="git checkout -b"
+alias diff="git diff --word-diff"
+alias diffn="git diff --name-only"
+alias diffh="git diff HEAD"
+
+# https://stackoverflow.com/questions/3573410/what-is-the-shortest-way-to-swap-staged-and-unstaged-changes-in-git
+alias swap="git commit -m Saved; git branch save-staged; stage; git commit -a -m Unstaged; git rebase --onto HEAD^^ HEAD^; git reset --hard save-staged; git rebase --onto HEAD@{1} HEAD^; git reset HEAD^; git reset --soft HEAD^; git branch -D save-staged"
+
+alias main="git checkout main"
+alias mas="git checkout master"
+alias dev="git checkout develop"
+alias rel="git checkout release"
+
+alias st="git status"
+alias t="st" # to make up for the fact that the first character typed is sometimes not taken into account in the terminal
+alias sh="git show"
+alias br="git branch"
+alias bra="git branch -a"
+alias brd="git branch -d"
+alias brdd="git branch -D"
+alias brm="git branch -m"
+alias ch="git checkout"
+alias chn="git checkout -b"
+alias ft="git fetch;git branch"
+alias pl="git pull"
+alias ph="git push"
+alias plh="pl;ph"
+alias phf="git push --force"
+alias phd="git push origin --delete"
+alias phh="git push --set-upstream origin"
+alias upd="stage;stash;pl;po"
+alias cabort="git cherry-pick --abort"
+alias mabort="git merge --abort"
+alias rabort="git revert --abort"
+alias undo="git checkout -f; git clean -fd"
+alias patch="git add --patch"
+alias prune="git fetch;git remote prune origin;git prune"
+alias cherry="git cherry-pick"
+
+alias ignore="git update-index --assume-unchanged"
+alias unignore="git update-index --no-assume-unchanged"
+
+# NPM
+alias ninit="npm init"
+alias ni="npm install"
+alias nif="npm install --force"
+alias nr="npm run"
+alias nci="npm ci"
+alias nps="jq -r '.scripts | to_entries[] | \"\(.key): \(.value)\"' package.json"
+alias npd="jq -r '.dependencies | to_entries[] | \"\(.key): \(.value)\"' package.json"
+alias npdd="jq -r '.devDependencies | to_entries[] | \"\(.key): \(.value)\"' package.json"
+
+# ANGULAR
+alias nb="ng build"
+alias ns="ng serve"
+alias nins="ni;ng serve"
+
+# DOCKER
+alias di="docker image"
+alias dils="docker image ls"
+alias dilsa="docker image ls -a"
+alias dib="docker image build"
+alias dirm="docker image rm"
+alias dc="docker container"
+alias dcls="docker container ls"
+alias dclsa="docker container ls -a"
+alias dcs="docker container stop"
+alias dck="docker container kill"
+alias dcrm="docker container rm"
+alias dcrmall="docker container rm -f \$(docker container ls -a -q)"
+alias dcr="docker container run -it --rm"
+alias dcrd="docker container run -itd --rm"
+alias dv="docker volume"
+alias dp="docker pull"
+alias dps="docker ps"
+alias ds="docker search"
+alias dprune="docker system prune"
+alias dcstopall="docker container stop \$(docker container ls -a -q)"
+alias dversion="docker version"
+alias dinfo="docker info"
+
+# KUBERNETES
+alias ku="kubectl"
+alias kaf="kubectl apply -f"
+alias kgp="kubectl get pods"
+alias kgs="kubectl get services"
+alias kgd="kubectl get deployments"
+alias kdp="kubectl describe pod"
+alias kds="kubectl describe service"
+alias kdd="kubectl describe deployment"
+
+# DOTNET
+alias dn="dotnet new"
+alias da="dotnet add"
+alias db="dotnet build"
+alias cdb="cl;db"
+alias b="db" # to make up for the fact that the first character typed is sometimes not taken into account in the terminal
+alias dr="dotnet run"
+alias drp="dotnet run --project"
+alias cdrp="cl;drp"
+alias rp="drp" # to make up for the fact that the first character typed is sometimes not taken into account in the terminal
+alias drw="dotnet watch run --non-interactive"
+alias drpw="dotnet watch run --non-interactive --project"
+alias dt="dotnet test"
+alias dtf="dotnet test --filter"
+alias nuget="dotnet nuget"
+alias dwhy="dotnet nuget why"
+
+# https://learn.microsoft.com/en-us/ef/core/cli/dotnet
+alias def="dotnet ef"
+alias add-migration="def migrations add"
+alias remove-migration="def migrations remove"
+alias update-database="def database update"
+alias update-db="update-database"
+
+# PYTHON
+alias py="python"
+
+alias pss="ps -s | grep 'dotnet\|node'"
+alias ss="pss"
+knet() {
+    kill $(ps aux | grep dotnet | awk '{print $1}')
+}
+knode() {
+    kill $(ps aux | grep node | awk '{print $1}')
+    kp 4200
+    kp 4300
+    kp 5300
+}
+alias kall="knet;knode"
