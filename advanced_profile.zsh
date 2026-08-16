@@ -158,3 +158,13 @@ function yti() {
 
 # xsel must be installed
 alias pt="xsel --clipboard --output"
+
+# Claude Code must be installed
+alias cc=claude
+alias ccr="claude --resume"
+
+# Open Code must be installed
+alias opc=opencode
+
+# WezTerm must be installed
+alias wezterm="flatpak run org.wezfurlong.wezterm"

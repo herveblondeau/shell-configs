@@ -414,3 +414,13 @@ end
 
 # xsel must be installed
 abbr --add pt "xsel --clipboard --output"
+
+# Claude Code must be installed
+abbr --add cc claude
+abbr --add ccr "claude --resume"
+
+# Open Code must be installed
+abbr --add opc opencode
+
+# WezTerm must be installed
+abbr --add wezterm "flatpak run org.wezfurlong.wezterm"
