@@ -2,26 +2,45 @@
 
 # Global editing
 set -x EDITOR "vi"
-fish_default_key_bindings
-# fish_vi_key_bindings
 
 # Key bindings
-bind ctrl-delete kill-word                       # Ctrl+Delete
-bind ctrl-h backward-kill-word                   # Ctrl+Backspace
-bind ctrl-alt-f kill-word                        # Ctrl+Alt-F (used to extend Emacs movement shortcuts: Alt and Ctrl-F)
-bind ctrl-alt-b backward-kill-word               # Ctrl+Alt-B (used to extend Emacs movement shortcuts: Alt and Ctrl-B)
-# Previous:
-#bind \b backward-kill-word                      # Ctrl+Backspace
-#bind \e\[3\;5\~ kill-word                       # Ctrl+Delete
+function fish_user_key_bindings
+    # Erase a preset binding (e.g., Ctrl+P for history search)
+    # bind --erase --preset \cp
+    bind ctrl-delete kill-word                       # Ctrl+Delete
+    bind ctrl-backspace backward-kill-word                   # Ctrl+Backspace
+    bind alt-backspace backward-kill-line
+    bind alt-delete kill-line
 
-bind alt-left 'prevd;commandline -f repaint'     # Force prevd to refresh the prompt
-bind alt-right 'nextd;commandline -f repaint'    # Force nextd to refresh the prompt
-# Previous:
-#bind \e\[1\;3D 'prevd;commandline -f repaint'   # Force prevd to refresh the prompt
-#bind \e\[1\;3C 'nextd;commandline -f repaint'   # Force nextd to refresh the prompt
+    bind alt-h backward-char
+    bind alt-l forward-char
+    bind alt-k up-or-search
+    bind alt-j down-or-search
+    bind ctrl-h backward-word
+    bind ctrl-l forward-word
+    bind ctrl-alt-h beginning-of-line
+    bind ctrl-alt-l end-of-line
+    bind alt-shift-h backward-delete-char
+    bind alt-shift-l delete-char
+    bind ctrl-shift-h backward-kill-word
+    bind ctrl-shift-l kill-word
+    bind ctrl-alt-shift-h backward-kill-line
+    bind ctrl-alt-shift-l kill-line
 
-bind alt-backspace backward-kill-line
-bind alt-delete kill-line
+    bind ctrl-alt-f kill-word                        # Ctrl+Alt-F (used to extend Emacs movement shortcuts: Alt and Ctrl-F)
+    bind ctrl-alt-b backward-kill-word               # Ctrl+Alt-B (used to extend Emacs movement shortcuts: Alt and Ctrl-B)
+    # Previous:
+    #bind \b backward-kill-word                      # Ctrl+Backspace
+    #bind \e\[3\;5\~ kill-word                       # Ctrl+Delete
+
+    bind alt-left 'prevd;commandline -f repaint'     # Force prevd to refresh the prompt
+    bind alt-right 'nextd;commandline -f repaint'    # Force nextd to refresh the prompt
+    # Previous:
+    #bind \e\[1\;3D 'prevd;commandline -f repaint'   # Force prevd to refresh the prompt
+    #bind \e\[1\;3C 'nextd;commandline -f repaint'   # Force nextd to refresh the prompt
+
+end   
+
 
 # Bash command shortcuts
 abbr --add ll "ls -l"
